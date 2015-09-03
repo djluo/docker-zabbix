@@ -1,0 +1,34 @@
+# vim:set et ts=2 sw=2 syntax=dockerfile:
+
+FROM       docker.xlands-inc.com/baoyu/debian
+MAINTAINER djluo <dj.luo@baoyugame.com>
+
+RUN export http_proxy="http://172.17.42.1:8080/" \
+    && export DEBIAN_FRONTEND=noninteractive     \
+    && curl -sLo /temp.deb \
+            http://repo.zabbix.com/zabbix/2.4/debian/pool/main/z/zabbix-release/zabbix-release_2.4-1+wheezy_all.deb \
+    && dpkg -i /temp.deb \
+    && rm   -f /temp.deb \
+    && apt-get update \
+    && apt-get build-dep -y zabbix \
+    && apt-get clean
+
+RUN export http_proxy="http://172.17.42.1:8080/" \
+    && export DEBIAN_FRONTEND=noninteractive     \
+    && apt-get update \
+    && apt-get install -y devscripts \
+    && curl -sLo /foreground.patch \
+         https://raw.githubusercontent.com/zabbix/zabbix-community-docker/master/Dockerfile/zabbix-server-2.4/foreground.patch
+
+RUN echo '#!/bin/bash' > /build.sh \
+    && echo 'cd /build/'            >> /build.sh \
+    && echo 'apt-get source zabbix' >> /build.sh \
+    && echo 'cd zabbix-*'           >> /build.sh \
+    && echo 'patch -p0 < /f*.patch' >> /build.sh \
+    && echo 'debuild -b -us -uc'    >> /build.sh \
+    && chmod +x /build.sh
+
+VOLUME  /build/
+WORKDIR /build/
+
+CMD     ["/build.sh"]

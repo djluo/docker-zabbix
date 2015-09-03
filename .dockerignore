@@ -1,0 +1,12 @@
+.git
+*.swp
+data
+log
+logs
+.config
+*.gz
+Dockerfile.centos
+images/*
+README.md
+build
+buildbak
