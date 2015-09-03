@@ -9,7 +9,7 @@ RUN export http_proxy="http://172.17.42.1:8080/" \
     && url="http://172.17.42.1:8080/zabbix-debs/zabbix-server-mysql_2.4.6-1+wheezy_amd64.deb" \
     && curl -sLo  /zabbix.deb $url \
     && dpkg -i    /zabbix.deb \
-    ; apt-get install -f -y  \
+    ;  apt-get install -f -y  \
     && apt-get install    -y supervisor \
     && apt-get clean \
     && unset url \
@@ -23,7 +23,8 @@ RUN export http_proxy="http://172.17.42.1:8080/" \
     && find var/lib/apt -type f -exec rm -fv {} \;
 
 
-COPY ./server/ /
+COPY   ./server/ /
+VOLUME  /logs
 
 ENTRYPOINT ["/entrypoint.pl"]
-CMD        ["/usr/sbin/zabbix_server", "-f"]
+CMD        ["/usr/bin/supervisord", "-n", "-c", "/supervisord.conf"]
