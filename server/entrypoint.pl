@@ -42,5 +42,5 @@ unlink($pidfile) if ( -f $pidfile);
 $( = $) = $gid; die "switch gid error\n" if $gid != $( ;
 $< = $> = $uid; die "switch uid error\n" if $uid != $< ;
 $ENV{'HOME'} = "/home/docker";
-print "@ARGV\n";
+
 exec(@ARGV);

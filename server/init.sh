@@ -12,8 +12,12 @@ grant all privileges on zabbix.* to zabbix@'172.%'     identified by '${PW}';
 EOF
 
 i=0
+pushd /usr/share/zabbix-server-mysql
 for sql in schema.sql images.sql data.sql
 do
-  zcat /usr/share/zabbix-server-mysql/${sql}.gz | mysql -uroot -S ${DBSocket} zabbix && let i+=1
+  [ -f ./${sql}.gz ] || continue
+  zcat ./${sql}.gz | mysql -uroot -S ${DBSocket} zabbix && let i+=1
 done
+popd
+
 [ $i -eq 3 ] && touch /logs/mysql-init-${VER}.lock
