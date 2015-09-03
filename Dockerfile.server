@@ -19,7 +19,7 @@ RUN export http_proxy="http://172.17.42.1:8080/" \
     && /bin/rm -f /zabbix.deb \
     && unset url
 
-#ADD ./entrypoint.pl      /entrypoint.pl
+COPY ./server/ /
 
-#ENTRYPOINT ["/entrypoint.pl"]
-#CMD        ["/usr/sbin/danted"]
+ENTRYPOINT ["/entrypoint.pl"]
+CMD        ["/usr/sbin/zabbix_server", "-f"]

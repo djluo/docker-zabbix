@@ -33,16 +33,14 @@ unless (getpwuid("$uid")){
   add_user("docker", "$uid");
 }
 
-my $dir = "/logs";
-if ( -d $dir && (stat($dir))[4] != $uid ){
-  system("chown docker.docker -R " . $dir);
-}
+system("chown", "docker.docker", "-R", "/logs") if ( -d "/logs");
 system("/init.sh") unless ( -f "/logs/mysql-init-$ver.lock" );
 
-# 切换当前运行用户,先切GID.
-#$GID = $EGID = $gid;
-#$UID = $EUID = $uid;
+my $pidfile="/tmp/zabbix_server.pid";
+unlink($pidfile) if ( -f $pidfile);
+
 $( = $) = $gid; die "switch gid error\n" if $gid != $( ;
 $< = $> = $uid; die "switch uid error\n" if $uid != $< ;
-
+$ENV{'HOME'} = "/home/docker";
+print "@ARGV\n";
 exec(@ARGV);
