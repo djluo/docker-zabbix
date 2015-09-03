@@ -1,24 +1,22 @@
 # vim:set et ts=2 sw=2 syntax=dockerfile:
 #
-FROM docker.xlands-inc.com/baoyu/zabbix-base
+FROM docker.xlands-inc.com/baoyu/debian
 MAINTAINER djluo <dj.luo@baoyugame.com>
 
 RUN export http_proxy="http://172.17.42.1:8080/" \
     && export DEBIAN_FRONTEND=noninteractive     \
-    && url="http://172.17.42.1:8080/zabbix-debs/zabbix-proxy-mysql_2.4.6-1+wheezy_amd64.deb" \
+    && apt-get update \
+    && url="http://172.17.42.1:8080/zabbix-debs/zabbix-server-mysql_2.4.6-1+wheezy_amd64.deb" \
     && curl -sLo  /zabbix.deb $url \
     && dpkg -i    /zabbix.deb \
+    ;  apt-get install -f -y  \
+    && apt-get install    -y supervisor  \
+    && apt-get purge -y zabbix-server-mysql \
+    && apt-get clean \
     && unset url \
     && rm -rf /zabbix.deb \
     && rm -rf usr/share/locale \
     && rm -rf usr/share/man    \
     && rm -rf usr/share/doc    \
     && rm -rf usr/share/info   \
-    && gzip /usr/share/zabbix-proxy-mysql/*sql \
     && find var/lib/apt -type f -exec rm -fv {} \;
-
-COPY   ./proxy/ /
-VOLUME  /logs
-
-ENTRYPOINT ["/entrypoint.pl"]
-CMD        ["/usr/bin/supervisord", "-n", "-c", "/supervisord.conf"]
