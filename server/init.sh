@@ -14,6 +14,6 @@ EOF
 i=0
 for sql in schema.sql images.sql data.sql
 do
-  cat /usr/share/zabbix-server-mysql/${sql} | mysql -uroot -S ${DBSocket} zabbix && let i+=1
+  zcat /usr/share/zabbix-server-mysql/${sql}.gz | mysql -uroot -S ${DBSocket} zabbix && let i+=1
 done
 [ $i -eq 3 ] && touch /logs/mysql-init-${VER}.lock
