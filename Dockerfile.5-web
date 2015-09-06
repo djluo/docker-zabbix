@@ -1,0 +1,12 @@
+# vim:set et ts=2 sw=2 syntax=dockerfile:
+#
+FROM       docker.xlands-inc.com/baoyu/php-fpm
+MAINTAINER djluo <dj.luo@baoyugame.com>
+
+RUN export http_proxy="http://172.17.42.1:8080/" \
+    && curl -sLo  /zabbix.tar.gz http://172.17.42.1:8080/zabbix-debs/zabbix-frontend.tar.gz
+
+COPY ./web/ /
+
+ENTRYPOINT ["/entrypoint.pl"]
+CMD        ["/usr/sbin/php5-fpm", "--fpm-config", "/php-fpm.conf"]
