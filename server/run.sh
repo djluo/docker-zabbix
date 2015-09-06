@@ -29,7 +29,7 @@ app_port=${app_port:=${default_port}}
 _port
 
 _run() {
-  local mode="-d --entrypoint=/entrypoint.pl" #--restart=always"
+  local mode="-d --restart=always"
   local name="$container_name"
   local cmd="/usr/bin/supervisord -n -c /supervisord.conf"
 
