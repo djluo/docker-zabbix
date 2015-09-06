@@ -15,7 +15,7 @@
 # container_name is "dir1-dir2"
 _container_name ${current_dir}
 
-images="${registry}/baoyu/zabbix-server"
+images="${registry}/baoyu/zabbix-proxy"
 #default_port="172.17.42.1:9292:9292"
 
 action="$1"    # start or stop ...
@@ -29,13 +29,12 @@ app_port=${app_port:=${default_port}}
 _port
 
 _run() {
-  local mode="-d --entrypoint=/entrypoint.pl" #--restart=always"
+  local mode="-d --restart=always"
   local name="$container_name"
-  local cmd="/usr/sbin/zabbix_server -f"
+  local cmd="/usr/bin/supervisord -n -c /supervisord.conf"
 
   [ "x$1" == "xdebug" ] && _run_debug
 
-    #-v ${current_dir}/conf/msmtp.conf:/etc/zabbix/msmtp.conf   \
   sudo docker run $mode $port \
     -e "TZ=Asia/Shanghai"     \
     -e "User_Id=${User_Id}"   \
@@ -44,12 +43,7 @@ _run() {
     -e "VER=2.4.6" \
     -e "backup_ip=172.17.42.1" \
     -v ${current_dir}/logs/:/logs/   \
-    -v ${current_dir}/init.sh:/init.sh   \
-    -v ${current_dir}/entrypoint.pl:/entrypoint.pl \
-    -v ${current_dir}/conf/monitrc:/etc/monit/monitrc \
-    -v ${current_dir}/conf/monit.conf:/etc/monit/conf.d/zabbix_server.conf \
-    -v ${current_dir}/conf/baojing.sh:/alertscripts/baojing.sh \
-    -v ${current_dir}/conf/zabbix_server.conf:/etc/zabbix/zabbix_server.conf \
+    -v ${current_dir}/conf/zabbix_proxy.conf:/etc/zabbix/zabbix_proxy.conf \
     -v ${current_dir}/../mysql/logs/:/mysql/   \
     --name ${name} ${images} \
     $cmd
