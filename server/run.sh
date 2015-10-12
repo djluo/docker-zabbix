@@ -39,12 +39,10 @@ _run() {
   sudo docker run $mode $port \
     -e "TZ=Asia/Shanghai"     \
     -e "User_Id=${User_Id}"   \
-    -e "RSYNC_PASSWORD=docker" \
-    -e "backup_dest=$name"     \
     -e "VER=2.4.6" \
-    -e "backup_ip=172.17.42.1" \
+    -e "CropID=weixin" \
+    -e "Secret=weixin" \
     -v ${current_dir}/logs/:/logs/   \
-    -v ${current_dir}/conf/baojing.sh:/alertscripts/baojing.sh \
     -v ${current_dir}/conf/zabbix_server.conf:/etc/zabbix/zabbix_server.conf \
     -v ${current_dir}/../mysql/logs/:/mysql/   \
     --name ${name} ${images} \
