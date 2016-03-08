@@ -40,8 +40,46 @@ for my $pid ("/tmp/supervisord.pid","/tmp/zabbix_java.pid"){
   unlink($pid) if ( -f $pid);
 }
 
+my $agent_dir  = "/etc/zabbix/zabbix_agentd.d/";
+my $script_dir = "/etc/zabbix/script/";
+my $zabbix_dir = "/var/lib/zabbix/";
+
+system("cp", "-v", "/example/java.conf",   "$agent_dir" ) if ( -d "$agent_dir" );
+system("cp", "-v", "/example/lld-java.py", "$script_dir") if ( -d "$script_dir");
+system("cp", "-v", "/example/.my.cnf",     "$zabbix_dir") if ( -d "$zabbix_dir");
+
+my $socket   = "/var/lib/mysql/mysql.sock";
+my $password = "zabbix1";
+
+$socket   = $ENV{'socket'}   if $ENV{'socket'};
+$password = $ENV{'password'} if $ENV{'password'};
+
+system("sed", "-i", "s%\\(^socket   =\\).*%\\1 $socket%",   "$zabbix_dir/.my.cnf");
+system("sed", "-i", "s%\\(^password =\\).*%\\1 $password%", "$zabbix_dir/.my.cnf");
+system("chmod", "400", "$zabbix_dir/.my.cnf");
+
+
 $( = $) = $gid; die "switch gid error\n" if $gid != $( ;
 $< = $> = $uid; die "switch uid error\n" if $uid != $< ;
 $ENV{'HOME'} = "/home/docker";
 
-exec(@ARGV);
+# 设置CLASSPATH
+my $zabbix_bin = "/usr/sbin/zabbix_java";
+
+my @all="$zabbix_bin/lib";
+for my $dir ( ( "$zabbix_bin/lib", "$zabbix_bin/bin") ) {
+  opendir(DIR, "$dir") or die "Error in opening dir $dir\n";
+  while(readdir(DIR)) {
+    next if ( $_ eq '.' or $_ eq '..');
+    next if $_ !~ /\.jar$/ ;
+    push @all, "$dir/$_";
+  }
+  closedir(DIR);
+}
+
+$ENV{'CLASSPATH'} = join(':', @all);
+
+my @JAVA_OPTS = ("-Xms32M", "-Xmx64M");
+   @JAVA_OPTS = split(/ /,$ENV{'JAVA_OPTS'}) if ($ENV{'JAVA_OPTS'});
+
+exec("/usr/bin/java", "-server", @JAVA_OPTS, "com.zabbix.gateway.JavaGateway");

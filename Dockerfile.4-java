@@ -6,11 +6,11 @@ MAINTAINER djluo <dj.luo@baoyugame.com>
 RUN export http_proxy="http://172.17.42.1:8080/" \
     && export DEBIAN_FRONTEND=noninteractive     \
     && apt-get update \
-    && url="http://172.17.42.1:8080/zabbix-debs/zabbix-java-gateway_2.4.6-1+wheezy_amd64.deb" \
+    && url="http://172.17.42.1:8080/zabbix-debs/zabbix-java-gateway_2.4.7-1+jessie_amd64.deb" \
     && curl -sLo  /zabbix.deb $url \
     && dpkg -i    /zabbix.deb \
     ;  apt-get install -f -y  \
-    && apt-get install    -y supervisor \
+    && apt-get autoremove -y  \
     && apt-get clean \
     && unset url \
     && rm -rf /zabbix.deb \
@@ -21,9 +21,9 @@ RUN export http_proxy="http://172.17.42.1:8080/" \
     && rm -rf usr/share/dbconfig-common \
     && find var/lib/apt -type f -exec rm -fv {} \;
 
+COPY ./java/java.conf     /example/
+COPY ./java/lld-java.py   /example/
+COPY ./java/my.cnf        /example/.my.cnf
+COPY ./java/entrypoint.pl /entrypoint.pl
 
-COPY   ./java/ /
-VOLUME  /var/log/zabbix/
-
-ENTRYPOINT ["/entrypoint.pl"]
-CMD        ["/usr/bin/supervisord", "-n", "-c", "/supervisord.conf"]
+CMD  ["/entrypoint.pl"]
