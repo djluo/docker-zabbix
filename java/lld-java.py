@@ -35,9 +35,12 @@ def discovery(path = "/var/lib/zabbix/java/"):
 
 if __name__ == '__main__':
 
-  if sys.argv[1] == "discovery":
+  if len(sys.argv) == 1:
+    print "usage"
+  elif sys.argv[1] == "discovery":
     discovery()
   elif len(sys.argv) == 3:
     proc, port, key = sys.argv
+    print port, key
   else:
     print "usage"
