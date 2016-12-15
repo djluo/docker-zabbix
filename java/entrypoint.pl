@@ -46,7 +46,6 @@ my $zabbix_dir = "/var/lib/zabbix/";
 
 system("cp", "-v", "/example/java.conf",   "$agent_dir" ) if ( -d "$agent_dir" );
 system("cp", "-v", "/example/lld-java.py", "$script_dir") if ( -d "$script_dir");
-system("cp", "-v", "/example/.my.cnf",     "$zabbix_dir") if ( -d "$zabbix_dir");
 
 my $socket   = "/var/lib/mysql/mysql.sock";
 my $password = "zabbix1";
@@ -54,6 +53,8 @@ my $password = "zabbix1";
 $socket   = $ENV{'socket'}   if $ENV{'socket'};
 $password = $ENV{'password'} if $ENV{'password'};
 
+system("mkdir", "-vm", "700", "$zabbix_dir") unless ( -d "$zabbix_dir");
+system("cp", "-v", "/example/.my.cnf", "$zabbix_dir") unless ( -f "$zabbix_dir/.my.cnf");
 system("sed", "-i", "s%\\(^socket   =\\).*%\\1 $socket%",   "$zabbix_dir/.my.cnf");
 system("sed", "-i", "s%\\(^password =\\).*%\\1 $password%", "$zabbix_dir/.my.cnf");
 system("chmod", "400", "$zabbix_dir/.my.cnf");
