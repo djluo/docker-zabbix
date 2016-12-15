@@ -5,7 +5,7 @@ MAINTAINER djluo <dj.luo@baoyugame.com>
 
 RUN export http_proxy="http://172.17.42.1:8080/" \
     && export DEBIAN_FRONTEND=noninteractive     \
-    && url="http://172.17.42.1:8080/zabbix-debs/zabbix-server-mysql_2.4.6-1+wheezy_amd64.deb" \
+    && url="http://172.17.42.1:8080/zabbix-debs/zabbix-server-mysql_2.4.7-1+jessie_amd64.deb" \
     && curl -sLo  /zabbix.deb $url \
     && dpkg -i    /zabbix.deb \
     && unset url \

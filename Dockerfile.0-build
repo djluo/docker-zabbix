@@ -1,12 +1,12 @@
 # vim:set et ts=2 sw=2 syntax=dockerfile:
 
-FROM       docker.xlands-inc.com/baoyu/debian
+FROM       docker.xlands-inc.com/baoyu/debian:8
 MAINTAINER djluo <dj.luo@baoyugame.com>
 
 RUN export http_proxy="http://172.17.42.1:8080/" \
     && export DEBIAN_FRONTEND=noninteractive     \
     && curl -sLo /temp.deb \
-            http://repo.zabbix.com/zabbix/2.4/debian/pool/main/z/zabbix-release/zabbix-release_2.4-1+wheezy_all.deb \
+            http://repo.zabbix.com/zabbix/2.4/debian/pool/main/z/zabbix-release/zabbix-release_2.4-1+jessie_all.deb \
     && dpkg -i /temp.deb \
     && rm   -f /temp.deb \
     && apt-get update \
