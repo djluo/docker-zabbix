@@ -18,7 +18,7 @@ def get_conf(path = "/var/lib/zabbix/java/"):
 
   return conf
 
-def discovery(path = "/var/lib/zabbix/java/"):
+def discovery():
   '''
   { "data": [ { "{#PORT}": "9000", "{#NAME}": "h1-4002-hajava" } ] }
   '''
@@ -31,7 +31,6 @@ def discovery(path = "/var/lib/zabbix/java/"):
     ip, port = line.split(':')
 
     pool["data"].append( { "{#PORT}": port, "{#NAME}": name } )
-  #print json.dumps(pool,indent=4)
   return pool
 
 def pool(key):
@@ -140,18 +139,23 @@ def queries(port, key):
   return value
 
 def usage():
-  print "Usage: %s discovery"   % sys.argv[0]
-  print "     : %s port key\n"  % sys.argv[0]
-  print "   ex: %s 9007 Uptime" % sys.argv[0]
+  print "Usage: %s discovery"  % sys.argv[0]
+  print "     : %s port key\n" % sys.argv[0]
+
+  pool = discovery()
+
+  port = 9000
+  if len(pool["data"]) > 0:
+    port = pool["data"][0]['{#PORT}']
+
+  print "   ex: %s %s Uptime"  % ( sys.argv[0], port )
   sys.exit(1)
 
 if __name__ == '__main__':
 
-  if len(sys.argv) == 1:
-    usage()
-  elif sys.argv[1] == "discovery":
+  if len(sys.argv) > 1 and sys.argv[1] == "discovery":
     pool = discovery()
-    print json.dumps(pool,indent=4)
+    print json.dumps(pool, indent=4)
   elif len(sys.argv) == 3:
     proc, port, key = sys.argv
     print queries(port,key)
