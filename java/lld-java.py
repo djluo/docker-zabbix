@@ -20,17 +20,19 @@ def get_conf(path = "/var/lib/zabbix/java/"):
 
 def discovery():
   '''
+  in:
+  { "ip": "172.17.42.1", "port": 9006, "name": "activemq6" }
+
+  out:
   { "data": [ { "{#PORT}": "9000", "{#NAME}": "h1-4002-hajava" } ] }
   '''
   pool = { "data": [] }
   conf = get_conf()
   for app in conf:
-    name=os.path.basename(app).rstrip(".conf")
     with open(app, 'r') as f:
-      line=f.readline().rstrip('\n')
-    ip, port = line.split(':')
+      data = json.loads(f.read())
 
-    pool["data"].append( { "{#PORT}": port, "{#NAME}": name } )
+    pool["data"].append( { "{#PORT}": data["port"], "{#NAME}": data["name"] } )
   return pool
 
 def pool(key):
